@@ -17,10 +17,11 @@ p1result part_1()
     ifstream input_file("input.txt");
     vector<int> numbers;
 
-    int prev_number = -1; int number = 0; int n_increases = 0;
+    int prev_number = std::numeric_limits<int>::max();
+    int number = 0; int n_increases = 0;
 
     while (input_file >> number) {
-        if (prev_number < number && prev_number != -1) n_increases++;
+        if (prev_number < number) n_increases++;
         prev_number = number;
         numbers.push_back(number);
     }
