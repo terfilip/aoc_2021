@@ -21,9 +21,6 @@ instructions read_input() {
         input_file >> n;
         instrs.push_back(make_pair(instr, n));
     }
-    cout << instrs.size() << endl;
-    cout << instrs[0].first << endl;
-    cout << instrs[0].second << endl;
     return instrs;
 }
 
