@@ -59,7 +59,6 @@ int part_2(const std::vector<int>& poss)
 
 int main()
 {
-    std::cout << "Hello World!\n";
     std::string test_line = "16,1,2,0,4,2,7,1,2,14";
     std::ifstream input_file("input.txt");
     std::string line;
