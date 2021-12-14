@@ -26,7 +26,7 @@ std::vector<int> split_line(std::string str, char splitchar)
 }
 
 
-ulong fish_sim(std::vector<int> fish_sizes, const int n_days) 
+ulong fish_sim(const std::vector<int>& fish_sizes, const int n_days) 
 {
     std::unordered_map<int, ulong> fish_dict;
 
