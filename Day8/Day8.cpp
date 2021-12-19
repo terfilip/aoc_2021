@@ -71,14 +71,16 @@ int part_2(display_info& info) {
             }
         }
 
-		string n ("");
+		//string n ("");
+        int n = 0;
         for (const string& output : info_line.second) {
             int l = output.size();
+            n *= 10;
 
-            if (l == 2) n += "1";
-            else if (l == 4) n += "4";
-            else if (l == 3) n += "7";
-            else if (l == 7) n += "8";
+            if (l == 2) n += 1;
+            else if (l == 4) n += 4;
+            else if (l == 3) n += 7;
+            else if (l == 7) n += 8;
             else if (l == 5 || l == 6) {
                 set<char> s(output.begin(), output.end());
                 vector<char> s_2_inter;
@@ -86,18 +88,21 @@ int part_2(display_info& info) {
 				std::set_intersection(s.begin(), s.end(), d[2].begin(), d[2].end(), back_inserter(s_2_inter));
 				std::set_intersection(s.begin(), s.end(), d[4].begin(), d[4].end(), back_inserter(s_4_inter));
                 if (l == 5) {
-                    if (s_2_inter.size() == 2) n += "3";
-                    else if (s_4_inter.size() == 2) n += "2";
-                    else n += "5";
+                    if (s_2_inter.size() == 2) n += 3;
+                    else if (s_4_inter.size() == 2) n += 2;
+                    else n += 5;
                 }
                 else {
-                    if (s_2_inter.size() == 1) n += "6";
-                    else if (s_4_inter.size() == 4) n += "9";
-                    else n += "0";
+                    if (s_2_inter.size() == 1) n += 6;
+                    else if (s_4_inter.size() == 4) n += 9;
+                    else n += 0;
                 }
             }
+            else {
+                n = n / 10;
+            }
         }
-        ans += stoi(n);
+        ans += n;
     }
     return ans;
 }
