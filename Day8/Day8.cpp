@@ -24,9 +24,9 @@ display_info parse_info(ifstream& input_file)
     display_info info;
 
     while (getline(input_file, line)) {
-		vector<string> parts;
-		vector<string> signals;
-		vector<string> outputs;
+        vector<string> parts;
+        vector<string> signals;
+        vector<string> outputs;
 
         boost::split(parts, line, [](char c) {return c == '|'; });
 
@@ -58,7 +58,7 @@ int part_1(display_info& info) {
 
 int part_2(display_info& info) {
 
-	int ans = 0;
+    int ans = 0;
     for (const auto& info_line : info) {
         
         unordered_map<int, set<char>> d;
@@ -66,12 +66,12 @@ int part_2(display_info& info) {
         for (const string& sig : info_line.first) {
             int l = sig.size();
             if (l == 2 || l == 4) {
-				set<char> s(sig.begin(), sig.end());
+                set<char> s(sig.begin(), sig.end());
                 d[l] = s;
             }
         }
 
-		//string n ("");
+        //string n ("");
         int n = 0;
         for (const string& output : info_line.second) {
             int l = output.size();
@@ -85,8 +85,8 @@ int part_2(display_info& info) {
                 set<char> s(output.begin(), output.end());
                 vector<char> s_2_inter;
                 vector<char> s_4_inter;
-				std::set_intersection(s.begin(), s.end(), d[2].begin(), d[2].end(), back_inserter(s_2_inter));
-				std::set_intersection(s.begin(), s.end(), d[4].begin(), d[4].end(), back_inserter(s_4_inter));
+                std::set_intersection(s.begin(), s.end(), d[2].begin(), d[2].end(), back_inserter(s_2_inter));
+                std::set_intersection(s.begin(), s.end(), d[4].begin(), d[4].end(), back_inserter(s_4_inter));
                 if (l == 5) {
                     if (s_2_inter.size() == 2) n += 3;
                     else if (s_4_inter.size() == 2) n += 2;

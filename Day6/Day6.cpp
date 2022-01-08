@@ -13,7 +13,7 @@ typedef unsigned long long ulong;
 
 std::vector<int> split_line(std::string str, char splitchar)
 {
-	std::stringstream ss(str);
+    std::stringstream ss(str);
     std::vector<int> vect;
 
     for (int i; ss >> i;) {
@@ -39,7 +39,7 @@ ulong fish_sim(const std::vector<int>& fish_sizes, const int n_days)
     //Fish Initializer End
 
     for (int i = 0; i < n_days; ++i) {
-		ulong fish_to_spawn = fish_dict[0];
+        ulong fish_to_spawn = fish_dict[0];
 
         for (int j = 1; j <= 8; ++j) {
             fish_dict[j - 1] = fish_dict[j];

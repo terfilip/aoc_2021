@@ -100,7 +100,7 @@ int main()
         //cout << line << endl;
         size_t first_comma_index = line.find(",");
         size_t second_comma_index = line.find(",", first_comma_index + 1);
-		size_t splitter_index = line.find(" -> ");
+        size_t splitter_index = line.find(" -> ");
 
         int x1 = stoi(line.substr(0, first_comma_index));
         int y1 = stoi(line.substr(first_comma_index + 1, splitter_index));

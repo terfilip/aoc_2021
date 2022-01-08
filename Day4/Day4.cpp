@@ -14,7 +14,7 @@ typedef unsigned int uint;
 
 vector<uint> split_line(string str, char splitchar)
 {
-	stringstream ss(str);
+    stringstream ss(str);
     vector<uint> vect;
 
     for (int i; ss >> i;) {
@@ -72,7 +72,7 @@ int part_n(const vector<vector<vector<uint>>> const & boards, const vector<uint>
             if (board_has_won(board, drawn_numbers)) {
                 latest_chosen_number = chosen_numbers[i];
                 if (n == 1) {
-					victorious_board = board;
+                    victorious_board = board;
                     goto loopend;
                 }
                 else {
@@ -90,7 +90,7 @@ int part_n(const vector<vector<vector<uint>>> const & boards, const vector<uint>
     loopend:
 
     if (latest_chosen_number == - 1) {
-		throw runtime_error("wtf");
+        throw runtime_error("wtf");
     }
 
     if (n == 2) {

@@ -31,7 +31,7 @@ int part_1(const std::vector<int>& poss)
     for (int i = min_pos; i <= max_pos; ++i) {
         int cur_cost = 0;
         for (int p : poss) cur_cost += std::abs(i - p);
-		cost = std::min(cur_cost, cost);
+        cost = std::min(cur_cost, cost);
     }
 
     return cost;
@@ -44,12 +44,12 @@ int part_2(const std::vector<int>& poss)
     int cost = std::numeric_limits<int>::max();
 
     for (int i = min_pos; i <= max_pos; ++i) {
-		int cur_cost = 0;
+        int cur_cost = 0;
         for (int p : poss) {
             int n = std::abs(p - i);
             cur_cost += (n * (n + 1)) / 2;
         }
-		cost = std::min(cur_cost, cost);
+        cost = std::min(cur_cost, cost);
     }
 
     return cost;

@@ -64,7 +64,7 @@ int get_num_of_interest(const vector<vector<uint>>& numbers, int thingie)
     for (int colnum = 0; colnum < N_DIGITS; ++colnum) {
         int mcb = most_common_bit(numbers, colnum, (*indices)) ^ thingie;
         unique_ptr<vector<uint>> next_indices = indices_of_bit(numbers, colnum, indices, mcb);
-		if ((*next_indices).size() == 1) {
+        if ((*next_indices).size() == 1) {
             break;
         }
         indices = move(next_indices);
@@ -112,7 +112,7 @@ int main()
         int value = byte - '0';
         digits[ctr] += value;
         numbers[rowctr][ctr] = value;
-		++ctr;
+        ++ctr;
     }
 
     int gam = 0;
