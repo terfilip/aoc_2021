@@ -65,7 +65,6 @@ pair<disappointing_dirty_overflow_trick_by_aoc, bool> solve(const string& line) 
     }
     disappointing_dirty_overflow_trick_by_aoc auto_comp_score = 0;
     for (auto it = opening_chars.rbegin(); it != opening_chars.rend(); ++it) {
-        //char matching_close_char = open_to_close.find(*it)->second;
         int char_points = autocomp_points.find(*it)->second;
         auto_comp_score = ((5 * auto_comp_score) + char_points);
     }
