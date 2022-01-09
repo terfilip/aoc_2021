@@ -37,10 +37,10 @@ const unordered_map<char, int> sym_points = {
 };
 
 const unordered_map<char, int> autocomp_points = {
-    {')', 1},
-    {']', 2},
-    {'}', 3},
-    {'>', 4}
+    {'(', 1},
+    {'[', 2},
+    {'{', 3},
+    {'<', 4}
 };
 
 typedef unsigned long long disappointing_dirty_overflow_trick_by_aoc;
@@ -65,8 +65,8 @@ pair<disappointing_dirty_overflow_trick_by_aoc, bool> solve(const string& line) 
     }
     disappointing_dirty_overflow_trick_by_aoc auto_comp_score = 0;
     for (auto it = opening_chars.rbegin(); it != opening_chars.rend(); ++it) {
-        char matching_close_char = open_to_close.find(*it)->second;
-        int char_points = autocomp_points.find(matching_close_char)->second;
+        //char matching_close_char = open_to_close.find(*it)->second;
+        int char_points = autocomp_points.find(*it)->second;
         auto_comp_score = ((5 * auto_comp_score) + char_points);
     }
 
@@ -91,8 +91,6 @@ int main() {
         }
     }
     std::sort(p2_scores.begin(), p2_scores.end());
-    for (const auto& e: p2_scores)
-        cout << e << endl;
 
     cout << "Part 1: " << p1_total_score << endl;
     cout << "Part 2: " << p2_scores[p2_scores.size() / 2] << endl;
