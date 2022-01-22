@@ -39,7 +39,7 @@ bool islower_cave(const string& str) {
                         [](const char c) {return std::islower(c); }));
 }
 
-bool path_is_valid(const unique_ptr<vector<string>>& path, const int low_cave_thresh) {
+bool path_is_valid(const unique_ptr<vector<string>>& path) {
     int low_cave_count = 0;
     bool has_one_start = std::count(path->begin(), path->end(), "start") == 1;
     bool valid_end = std::count(path->begin(), path->end(), "end") <=1;
@@ -49,7 +49,7 @@ bool path_is_valid(const unique_ptr<vector<string>>& path, const int low_cave_th
     for (const auto& item : *path) {
         if (islower_cave(item)) {
             unsigned long long itemcnt = std::count(path->begin(), path->end(), item);
-            if (itemcnt > low_cave_thresh) {
+            if (itemcnt > 1) {
                 return false;
             }
         }
@@ -59,8 +59,39 @@ bool path_is_valid(const unique_ptr<vector<string>>& path, const int low_cave_th
     return true;
 }
 
+bool path_is_validp2(const unique_ptr<vector<string>>& path) {
+    int low_cave_count = 0;
+    bool has_one_start = std::count(path->begin(), path->end(), "start") == 1;
+    bool valid_end = std::count(path->begin(), path->end(), "end") <=1;
+    string found_thing_with_cnt2 = "";
+    if ((!has_one_start) || (!valid_end))
+        return false;
 
-int solve(graph_t& graph, const int low_cave_thresh) {
+    for (const auto& item : *path) {
+        if (islower_cave(item)) {
+            unsigned long long itemcnt = std::count(path->begin(), path->end(), item);
+            if (itemcnt > 1 && (found_thing_with_cnt2 == "")) {
+                found_thing_with_cnt2 = item;
+            }
+            else if (itemcnt > 1 && (found_thing_with_cnt2 != item)) {
+                return false;
+            }
+            else if (itemcnt > 2) {
+                return false;
+            }
+            else {
+                //OK cout << "raaaa" << endl;
+            } 
+        }
+        low_cave_count += islower_cave(item);
+    }
+
+    return true;
+}
+
+
+
+int solve(graph_t& graph, bool p2) {
     
     std::queue<unique_ptr<vector<string>>> node_q;
     string root = "start";
@@ -81,7 +112,7 @@ int solve(graph_t& graph, const int low_cave_thresh) {
             //if (path_is_valid(path)) {
                 path_ctr++;
                 /*
-                for (const auto& thing : path) {
+                for (const auto& thing : (*path)) {
                     cout << thing << " ";
                 }
                 cout << endl;
@@ -94,8 +125,15 @@ int solve(graph_t& graph, const int low_cave_thresh) {
                 unique_ptr<vector<string>> new_path = std::make_unique<vector<string>>();
                 std::copy(path->begin(), path->end(), std::back_inserter(*new_path));
                 new_path->push_back(adj);
-                if (path_is_valid(new_path, low_cave_thresh)) {
-                    node_q.push(std::move(new_path));
+                if (!p2) {
+                    if (path_is_valid(new_path)) {
+                        node_q.push(std::move(new_path));
+                    }
+                 }
+                else {
+                    if (path_is_validp2(new_path)) {
+                        node_q.push(std::move(new_path));
+                    }
                 }
             }
         }
@@ -131,5 +169,6 @@ int main()
     }
 
     //print_graph(graph);
-    cout << "Part 1: " << solve(graph, 1) << endl;
+    cout << "Part 1: " << solve(graph, false) << endl;
+    cout << "Part 2: " << solve(graph, true) << endl;
 }
