@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <map>
 #include <queue>
+#include <stack>
 #include <set>
 #include <cstring>
 #include <algorithm>
@@ -17,8 +18,86 @@ using std::unordered_map;
 using std::vector;
 using std::set;
 using std::unique_ptr;
+using std::shared_ptr;
 
 typedef unordered_map<string, set<string>> graph_t;
+
+constexpr bool DEBUG_MODE = false;
+
+
+bool str_islower(const string& str) {
+    return std::all_of(str.begin(),
+                        str.end(),
+                        [](const char c) {return std::islower(c); });
+}
+
+class Path {
+
+    public:
+        string back_node;
+        string double_occ_cave;
+        unordered_map<string, int> lower_cave_counts;
+        vector<string> debug_vector;
+
+        Path(string back_node) {
+            this->back_node = back_node;
+            this->lower_cave_counts = {};
+            this->double_occ_cave = "";
+
+            if (DEBUG_MODE)
+                this->debug_vector.push_back(back_node);
+
+            if (str_islower(back_node))
+                this->lower_cave_counts[back_node]++;
+        }
+        Path(const shared_ptr<Path> other) {
+            this->back_node = other->back_node;
+            this->double_occ_cave = other->double_occ_cave;
+            this->lower_cave_counts = other->lower_cave_counts;
+
+            if (DEBUG_MODE)
+                std::copy(other->debug_vector.begin(), other->debug_vector.end(), std::back_inserter(this->debug_vector));
+        }
+        bool add_next_node(string next_node, bool isp2) {
+            this->back_node = next_node;
+            bool next_is_lower_cave = str_islower(next_node);
+
+            if (DEBUG_MODE)
+                this->debug_vector.push_back(next_node);
+
+            if (!next_is_lower_cave) return true;
+
+            if (this->lower_cave_counts.find(next_node) == this->lower_cave_counts.end()) {
+                this->lower_cave_counts[next_node] = 1;
+                return true;
+            }
+            this->lower_cave_counts[next_node]++;
+            int lcc = this->lower_cave_counts[next_node];
+
+            if (lcc <= 1) {
+                return true;
+            }
+            else if (!isp2) {
+                return false;
+            }
+            else if (isp2) {
+                if ((next_node == "start") || (next_node == "end")) {
+                    return false;
+                }
+                else if ((lcc == 2) && (this->double_occ_cave == "")) {
+                    this->double_occ_cave = next_node;
+                    return true;
+                }
+                else if ((lcc == 2) &&(this ->double_occ_cave != next_node)) {return false;}
+                else {
+                    return false;
+                }
+            }
+             
+            
+        }
+};
+
 
 void print_graph(graph_t graph) {
     cout << "GRAPH :: " << endl;
@@ -30,112 +109,43 @@ void print_graph(graph_t graph) {
     }
 }
 
-
-bool islower_cave(const string& str) {
-    return ((str != "end") &&
-            (str != "start") &&
-            std::all_of(str.begin(),
-                        str.end(),
-                        [](const char c) {return std::islower(c); }));
-}
-
-bool path_is_valid(const unique_ptr<vector<string>>& path) {
-    int low_cave_count = 0;
-    bool has_one_start = std::count(path->begin(), path->end(), "start") == 1;
-    bool valid_end = std::count(path->begin(), path->end(), "end") <=1;
-    if ((!has_one_start) || (!valid_end))
-        return false;
-
-    for (const auto& item : *path) {
-        if (islower_cave(item)) {
-            unsigned long long itemcnt = std::count(path->begin(), path->end(), item);
-            if (itemcnt > 1) {
-                return false;
-            }
-        }
-        low_cave_count += islower_cave(item);
+void vecprint(vector<string> things) {
+    cout<< "Vector:    " << endl;
+    for (const auto& thing : things) {
+        cout << thing << " ";
     }
-
-    return true;
+    cout << endl;
 }
-
-bool path_is_validp2(const unique_ptr<vector<string>>& path) {
-    int low_cave_count = 0;
-    bool has_one_start = std::count(path->begin(), path->end(), "start") == 1;
-    bool valid_end = std::count(path->begin(), path->end(), "end") <=1;
-    string found_thing_with_cnt2 = "";
-    if ((!has_one_start) || (!valid_end))
-        return false;
-
-    for (const auto& item : *path) {
-        if (islower_cave(item)) {
-            unsigned long long itemcnt = std::count(path->begin(), path->end(), item);
-            if (itemcnt > 1 && (found_thing_with_cnt2 == "")) {
-                found_thing_with_cnt2 = item;
-            }
-            else if (itemcnt > 1 && (found_thing_with_cnt2 != item)) {
-                return false;
-            }
-            else if (itemcnt > 2) {
-                return false;
-            }
-            else {
-                //OK cout << "raaaa" << endl;
-            } 
-        }
-        low_cave_count += islower_cave(item);
-    }
-
-    return true;
-}
-
 
 
 int solve(graph_t& graph, bool p2) {
     
-    std::queue<unique_ptr<vector<string>>> node_q;
+    std::queue<unique_ptr<Path>> node_q;
     string root = "start";
     string sink = "end";
     int path_ctr = 0;
 
-    unique_ptr<vector<string>> cur_path_to_sink = std::make_unique<vector<string>>();
-    cur_path_to_sink->push_back(root);
-    node_q.push(std::move(cur_path_to_sink));
+    unique_ptr<Path> first = std::make_unique<Path>(root);
+    node_q.push(std::move(first));
 
     while (!node_q.empty()) {
-        unique_ptr<vector<string>> path = std::move(node_q.front());
-        string node = path->back();
+        shared_ptr<Path> path = std::move(node_q.front());
+        string node = path->back_node;
         node_q.pop();
 
         if (node == sink) {
-
-            //if (path_is_valid(path)) {
-                path_ctr++;
-                /*
-                for (const auto& thing : (*path)) {
-                    cout << thing << " ";
-                }
-                cout << endl;
-                */
-            //}
+            if (DEBUG_MODE)
+                vecprint(path->debug_vector);
+            path_ctr++;
         }
 
-        for (const string& adj : graph[node]) {
-            if (adj != "start") {
-                unique_ptr<vector<string>> new_path = std::make_unique<vector<string>>();
-                std::copy(path->begin(), path->end(), std::back_inserter(*new_path));
-                new_path->push_back(adj);
-                if (!p2) {
-                    if (path_is_valid(new_path)) {
-                        node_q.push(std::move(new_path));
-                    }
-                 }
-                else {
-                    if (path_is_validp2(new_path)) {
-                        node_q.push(std::move(new_path));
-                    }
-                }
+        for (const string adj : graph[node]) {
+            unique_ptr<Path> next_path = std::make_unique<Path>(path);
+            bool next_is_valid = next_path->add_next_node(adj, p2);
+            if (next_is_valid) {
+                node_q.push(std::move(next_path));
             }
+            
         }
     }
 
@@ -168,7 +178,7 @@ int main()
         graph_insert(graph, dst, src);
     }
 
-    //print_graph(graph);
     cout << "Part 1: " << solve(graph, false) << endl;
     cout << "Part 2: " << solve(graph, true) << endl;
 }
+
