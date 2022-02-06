@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <map>
 #include <utility>
 #include <set>
 #include <algorithm>
@@ -11,57 +12,105 @@ using std::cout;
 using std::endl;
 using std::vector;
 using std::unordered_map;
+using std::map;
 using std::ifstream;
 using std::string;
-
 
 constexpr bool USE_TEST = true;
 
 typedef unordered_map<string, char> instr_t;
 typedef unsigned long long decent_number_t;
+typedef unordered_map<string, decent_number_t> pairs_t;
 
 
+void print_pairs(const pairs_t& pairs) {
+    for (const auto& [pair, value] : pairs) {
+        cout << pair << "=>" << value << endl;
+    }
+    cout << endl;
+}
 
-void template_cycle(string& polytemp, instr_t& instrs) {
-    
-    size_t start_sz = polytemp.size();
-    for (int i = 0; i < (start_sz - 1); ++i) {
-        string cur_two_lets = polytemp.substr(i, 2);
-        if (instrs.find(cur_two_lets) != instrs.end()) {
-            polytemp.insert(i + 1, 1, instrs[cur_two_lets]);
-            ++i;
-            ++start_sz;
+pairs_t pairs_from_string(const string& polytemp) {
+    pairs_t pairs;
+
+    for (int i = 0; i < polytemp.size() - 1; ++i) {
+        string pair = polytemp.substr(i, 2);
+        
+        if (!pairs.contains(pair)) {
+            pairs[pair] = 1;
+        }
+        else {
+            pairs[pair]++;
         }
     }
-    //cout << polytemp << endl; 
+    return pairs;
 }
 
-int sln(const string& polytemp, instr_t& instrs, const std::set<char>& all_chars, const int step_cnt) {
-    string p1s = polytemp;
 
-    for (int i = 0; i < step_cnt; ++i) {
-        //cout << "\tStep " << i << endl;
-        template_cycle(p1s, instrs);
+pairs_t template_cycle(const pairs_t& cur_pairs, const instr_t& instrs) {
+    pairs_t new_pairs;
+
+    for (const auto& [ipair, ilet] : instrs) {
+        if (cur_pairs.contains(ipair)) {
+            decent_number_t cur_pair_count = cur_pairs.at(ipair);
+            string new_pair1 { ipair.at(0), ilet };
+            string new_pair2 { ilet, ipair.at(1)};
+            
+            if (!new_pairs.contains(new_pair1))
+                new_pairs[new_pair1] = cur_pair_count;
+            else
+                new_pairs[new_pair1] += cur_pair_count;
+
+            if (!new_pairs.contains(new_pair2))
+                new_pairs[new_pair2] = cur_pair_count;
+            else
+                new_pairs[new_pair2] += cur_pair_count;
+        }
     }
-    decent_number_t min_val = 0xffffffffffffffff;
-    decent_number_t max_val = 0;
+    return new_pairs;
+    
+}
 
+decent_number_t count_letters(pairs_t pairs, char let) {
+    decent_number_t cnt = 0;
+    for (const auto& [k, v] : pairs) {
+        if (k.at(0) == let)
+            cnt += v;
+    }
+    return cnt;
+}
+
+decent_number_t sln(const string& polytemp,
+                    const instr_t& instrs,
+                    const std::set<char>& all_chars,
+                    const int step_cnt) {
+     
+    const pairs_t pairs = pairs_from_string(polytemp);
+    pairs_t generated_pair = template_cycle(pairs, instrs);
+
+    for (int step = 0; step < (step_cnt - 1); ++step) {
+       generated_pair = template_cycle(generated_pair, instrs);
+    }
+
+    vector<std::pair<char, decent_number_t>> counts;
 
     for (const char& c : all_chars) {
-        decent_number_t cnt = std::count(p1s.begin(), p1s.end(), c);
-        if (cnt > max_val) max_val = cnt;
-        if (cnt < min_val) min_val = cnt;
-        cout << "\t\t[" << c << "]= " << cnt << endl;
-        cout << endl;
+        counts.push_back(std::make_pair(c, 
+                                        count_letters(generated_pair, c)));
     }
 
-    return max_val - min_val;
-}
+    auto [it_minc, it_maxc] = std::minmax_element(counts.begin(),
+                                                  counts.end(),
+                                                [](auto left, auto right) {return left.second < right.second;});
+    auto minc = *it_minc; auto maxc = *it_maxc;
+    decent_number_t res = maxc.second - minc.second ;
 
+    return res;
+}
 
 int main()
 {
-    ifstream input_file("input.txt"); //((USE_TEST) ? "test_input.txt" : "input.txt");
+    ifstream input_file ((USE_TEST) ? "test_input.txt" : "input.txt");
     std::set<char> all_chars;
     
     string polytemp;
@@ -85,9 +134,7 @@ int main()
     }
 
     cout << "Part 1: " << sln(polytemp, instrs, all_chars, 10) << endl;
-
-    for (int i = 0; i< 16; ++i)
-        cout << i << " cycles ans " << sln(polytemp, instrs, all_chars, i) << endl;
-
+    cout << "Part 2: " << sln(polytemp, instrs, all_chars, 40) << endl;
+    cout << "Add or subtract 1 to the solution depending on input" << endl;
 }
 
