@@ -25,13 +25,7 @@ pairs_t pairs_from_string(const string& polytemp) {
 
     for (int i = 0; i < polytemp.size() - 1; ++i) {
         string pair = polytemp.substr(i, 2);
-
-        if (!pairs.contains(pair)) {
-            pairs[pair] = 1;
-        }
-        else {
-            pairs[pair]++;
-        }
+        pairs[pair]++;
     }
     return pairs;
 }
@@ -68,14 +62,13 @@ decent_number_t sln(const string& polytemp,
     const int step_cnt) {
 
     const pairs_t pairs = pairs_from_string(polytemp);
-    pairs_t generated_pair = template_cycle(pairs, instrs);
 
+    pairs_t generated_pair = template_cycle(pairs, instrs);
     for (int step = 0; step < (step_cnt - 1); ++step) {
         generated_pair = template_cycle(generated_pair, instrs);
     }
 
     vector<std::pair<char, decent_number_t>> counts;
-
     for (const char& c : all_chars) {
         counts.push_back(std::make_pair(c, count_letters(generated_pair, c)));
     }
